@@ -1,0 +1,14 @@
+# this is not really right.
+# i expected that "stack exec -- ghci" would check that everything is up to date
+# but it doesn't. If there's a way to do that we could delete this whole ugly
+# mess
+
+restartfile=$1
+echo "watching $restartfile"
+STACK_YAML="../stack.yaml"
+stack build --fast --only-dependencies  || inotifywait -m $restartfile | while read x; do
+      echo "restarting current_ghci, watching $restartfile"
+      stack build --fast --only-dependencies && break;
+done
+echo "executing ghci"
+stack exec ghci $@
